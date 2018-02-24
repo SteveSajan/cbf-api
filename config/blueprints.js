@@ -69,4 +69,22 @@ module.exports.blueprints = {
 
   // autoWatch: true,
 
+  parseBlueprintOptions: function (req) {
+
+    // Get the default query options.
+    const queryOptions = req._sails.hooks.blueprints.parseBlueprintOptions(req);
+
+    // If this is the "find" or "populate" blueprint action, and the normal query options
+    // indicate that the request is attempting to set an exceedingly high `limit` clause,
+    // then prevent it (we'll say `limit` must not exceed 100).
+    if (req.options.blueprintAction === 'find' || req.options.blueprintAction === 'populate') {
+      if (queryOptions.criteria.limit > 50) {
+        queryOptions.criteria.limit = 50;
+      }
+    }
+
+    return queryOptions;
+
+  }
+
 };
