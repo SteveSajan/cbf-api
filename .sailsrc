@@ -3,7 +3,9 @@
     "modules": {}
   },
   "hooks": {
-    "grunt": false
+    "grunt": false,
+    "sockets": false,
+    "pubsub": false
   },
   "paths": {
     "public": "assets"
