@@ -10,6 +10,8 @@ module.exports = {
   attributes: {
     number: {type: 'number', required: true},
     title: {type: 'string', required: true},
+    key: {type: 'string'},
+    writers: {type: 'string'},
     lyrics: {type: 'string'},
     openSongLyrics: {type: 'string'}
   },
