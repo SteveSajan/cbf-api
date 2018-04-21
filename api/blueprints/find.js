@@ -44,7 +44,8 @@ module.exports = function findRecords(req, res) {
       return res.ok({
         data: matchingRecords,
         paging: {
-          next: getNextUrl(req, queryOptions, matchingRecords)
+          next: getNextUrl(req, queryOptions, matchingRecords),
+          prev: getPrevUrl(req, queryOptions)
         }
       });
 
@@ -54,15 +55,27 @@ module.exports = function findRecords(req, res) {
 
 
 function getNextUrl(req, queryOptions, matchingRecords) {
-  if (matchingRecords.length < queryOptions.criteria.limit) {
+  const url = URL.parse(req.url, true);
+  const limit = queryOptions.criteria.limit;
+  const skip = url.query.skip ? parseInt(url.query.skip, 10) : 0;
+  if (matchingRecords.length < limit) {
     return null;
   }
-  const url = URL.parse(req.url, true);
   delete url.search;
-  if (!url.query.skip) {
-    url.query.skip = 0;
+  url.query.limit = limit;
+  url.query.skip = skip + limit;
+  return url.format();
+}
+
+function getPrevUrl(req, queryOptions) {
+  const url = URL.parse(req.url, true);
+  const limit = queryOptions.criteria.limit;
+  const skip = url.query.skip ? parseInt(url.query.skip, 10) : 0;
+  if (!skip) {
+    return null;
   }
-  url.query.limit = queryOptions.criteria.limit;
-  url.query.skip = parseInt(url.query.skip, 10) + queryOptions.criteria.limit;
+  delete url.search;
+  url.query.limit = limit;
+  url.query.skip = skip - limit;
   return url.format();
 }

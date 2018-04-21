@@ -8,7 +8,7 @@
 module.exports = {
 
   attributes: {
-    number: {type: 'number', required: true},
+    number: {type: 'number'},
     title: {type: 'string', required: true},
     key: {type: 'string'},
     writers: {type: 'string'},
