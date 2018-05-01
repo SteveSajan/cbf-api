@@ -18,29 +18,17 @@ const formatUsageError = require('../../node_modules/sails/lib/hooks/blueprints/
 
 module.exports = function findRecords(req, res) {
 
-  const parseBlueprintOptions = req.options.parseBlueprintOptions || req._sails.config.blueprints.parseBlueprintOptions;
-
   // Set the blueprint action for parseBlueprintOptions.
   req.options.blueprintAction = 'find';
 
-  const queryOptions = parseBlueprintOptions(req);
+  const queryOptions = req._sails.config.blueprints.parseBlueprintOptions(req);
   const Model = req._sails.models[queryOptions.using];
 
-  Model
-    .find(queryOptions.criteria, queryOptions.populates).meta(queryOptions.meta)
-    .exec(function found(err, matchingRecords) {
-      if (err) {
-        // If this is a usage error coming back from Waterline,
-        // (e.g. a bad criteria), then respond w/ a 400 status code.
-        // Otherwise, it's something unexpected, so use 500.
-        switch (err.name) {
-          case 'UsageError':
-            return res.badRequest(formatUsageError(err, req));
-          default:
-            return res.serverError(err);
-        }
-      }
+  let findQuery = req.query.search ? handleSearch(Model, req.query.search, queryOptions) : null;
+  findQuery = findQuery ? findQuery : Model.find(queryOptions.criteria, queryOptions.populates).meta(queryOptions.meta);
 
+  findQuery
+    .then(matchingRecords => {
       return res.ok({
         data: matchingRecords,
         paging: {
@@ -48,9 +36,18 @@ module.exports = function findRecords(req, res) {
           prev: getPrevUrl(req, queryOptions)
         }
       });
-
+    })
+    .catch(err => {
+      // If this is a usage error coming back from Waterline,
+      // (e.g. a bad criteria), then respond w/ a 400 status code.
+      // Otherwise, it's something unexpected, so use 500.
+      switch (err.name) {
+        case 'UsageError':
+          return res.badRequest(formatUsageError(err, req));
+        default:
+          return res.serverError(err);
+      }
     });
-
 };
 
 
@@ -78,4 +75,24 @@ function getPrevUrl(req, queryOptions) {
   url.query.limit = limit;
   url.query.skip = skip - limit;
   return url.format();
+}
+
+function handleSearch(Model, searchParam, queryOptions) {
+  let query;
+  const modelName = queryOptions.using;
+  switch (modelName) {
+    case 'song':
+      query = {
+        $or: [
+          {title: new RegExp(searchParam, 'i')},
+          {number: parseInt(searchParam, 10)}
+        ]
+      };
+      break;
+  }
+  if (query) {
+    const db = Model.getDatastore().manager;
+    const collection = db.collection(modelName);
+    return collection.find(query).toArray();
+  }
 }
