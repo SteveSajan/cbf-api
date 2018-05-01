@@ -3,11 +3,11 @@
     "modules": {}
   },
   "hooks": {
-    "grunt": false,
     "sockets": false,
     "pubsub": false
   },
-  "paths": {
-    "public": "assets"
+  "_generatedWith": {
+    "sails": "1.0.1",
+    "sails-generate": "1.15.21"
   }
 }

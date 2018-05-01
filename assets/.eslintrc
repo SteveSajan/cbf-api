@@ -27,37 +27,35 @@
 
   "parserOptions": {
     "ecmaVersion": 8
+    //^ If you are not using a transpiler like Babel, change this to `5`.
   },
 
   "globals": {
-    "io": true,
-    "SAILS_LOCALS": true,
 
-    // Allow any other window globals you're relying on here; e.g.
+    // Allow any window globals you're relying on here; e.g.
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // "$": true,
-    // "Vue": true,
-    // "angular": true,
+    "SAILS_LOCALS": true,
+    "io": true,
+    "Cloud": true,
+    "parasails": true,
+    "$": true,
+    "_": true,
+    "bowser": true,
+    "StripeCheckout": true,
+    "Stripe": true,
+    "Vue": true,
+    "VueRouter": true,
+    // "moment": true,
     // ...etc.
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     // Make sure backend globals aren't indadvertently tolerated in our client-side JS:
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     "sails": false,
-    "_": false,
     "async": false,
-    // ...and any other backend globals (e.g. `"User": false`)
+    "User": false
+    // ...and any other backend globals (e.g. `"Organization": false`)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  },
-
-  "rules": {
-    "no-undef": [2]
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // ^^Note: If you've enabled the "no-undef" rule in the top level .eslintrc file, then
-    // the globalIds of models should also be explicitly disabled above under "globals".
-    // (In this scenario, also note that the following override for the "no-undef" rule
-    // could technically be removed since it's redundant.)
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   }
 
 }

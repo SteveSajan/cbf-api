@@ -101,4 +101,20 @@ module.exports.models = {
   },
 
 
+  /***************************************************************************
+  *                                                                          *
+  * Whether or not implicit records for associations should be cleaned up    *
+  * automatically using the built-in polyfill.  This is especially useful    *
+  * during development with sails-disk.                                      *
+  *                                                                          *
+  * Depending on which databases you're using, you may want to disable this  *
+  * polyfill in your production environment.                                 *
+  *                                                                          *
+  * (For production configuration, see `config/env/production.js`.)          *
+  *                                                                          *
+  ***************************************************************************/
+
+  cascadeOnDestroy: true
+
+
 };

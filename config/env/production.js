@@ -13,7 +13,7 @@
  * > If you're using git as a version control solution for your Sails app,
  * > this file WILL BE COMMITTED to your repository by default, unless you add
  * > it to your .gitignore file.  If your repository will be publicly viewable,
- * > don't add private/sensitive data (like API keys / db passwords) to this file!
+ * > don't add private/sensitive data (like API secrets / db passwords) to this file!
  *
  * For more best practices and tips, see:
  * https://sailsjs.com/docs/concepts/deployment
@@ -41,23 +41,38 @@ module.exports = {
      * 2. Install it as a dependency of your Sails app.                         *
      *    (For example:  npm install sails-mysql --save)                        *
      *                                                                          *
-     * 3. Then pass it in, along with a connection URL.                         *
+     * 3. Then set it here (`adapter`), along with a connection URL (`url`)     *
+     *    and any other, adapter-specific customizations.                       *
      *    (See https://sailsjs.com/config/datastores for help.)                 *
      *                                                                          *
      ***************************************************************************/
     default: {
       // adapter: 'sails-mysql',
       // url: 'mysql://user:password@host:port/database',
+      //--------------------------------------------------------------------------
+      //  /\   To avoid checking it in to version control, you might opt to set
+      //  ||   sensitive credentials like `url` using an environment variable.
+      //
+      //  For example:
+      //  ```
+      //  sails_datastores__default__url=mysql://admin:myc00lpAssw2D@db.example.com:3306/my_prod_db
+      //  ```
+      //--------------------------------------------------------------------------
+
+      /****************************************************************************
+      *                                                                           *
+      * More adapter-specific options                                             *
+      *                                                                           *
+      * > For example, for some hosted PostgreSQL providers (like Heroku), the    *
+      * > extra `ssl: true` option is mandatory and must be provided.             *
+      *                                                                           *
+      * More info:                                                                *
+      * https://sailsjs.com/config/datastores                                     *
+      *                                                                           *
+      ****************************************************************************/
+      // ssl: true,
+
     },
-    //--------------------------------------------------------------------------
-    //  /\   To avoid checking it in to version control, you might opt to set
-    //  ||   sensitive credentials like `url` using an environment variable.
-    //
-    //  For example:
-    //  ```
-    //  sails_datastores__default__url=mysql://admin:myc00lpAssw2D@db.example.com:3306/my_prod_db
-    //  ```
-    //--------------------------------------------------------------------------
 
   },
 
@@ -75,6 +90,17 @@ module.exports = {
      *                                                                          *
      ***************************************************************************/
     migrate: 'safe',
+
+    /***************************************************************************
+    *                                                                          *
+    * If, in production, this app has access to physical-layer CASCADE         *
+    * constraints (e.g. PostgreSQL or MySQL), then set those up in the         *
+    * database and uncomment this to disable Waterline's `cascadeOnDestroy`    *
+    * polyfill.  (Otherwise, if you are using a databse like Mongo, you might  *
+    * choose to keep this enabled.)                                            *
+    *                                                                          *
+    ***************************************************************************/
+    // cascadeOnDestroy: false,
 
   },
 
@@ -142,17 +168,18 @@ module.exports = {
      *                                                                          *
      * Production session store configuration.                                  *
      *                                                                          *
-     * Uncomment the following lines to set up a production session store       *
-     * package called "connect-redis" that will use Redis to share session      *
-     * data across a cluster of multiple Sails/Node.js servers or processes.    *
+     * Uncomment the following lines to finish setting up a package called      *
+     * "@sailshq/connect-redis" that will use Redis to handle session data.     *
+     * This makes your app more scalable by allowing you to share sessions      *
+     * across a cluster of multiple Sails/Node.js servers and/or processes.     *
      * (See http://bit.ly/redis-session-config for more info.)                  *
      *                                                                          *
-     * > While "connect-redis" is a popular choice for Sails apps, many other   *
-     * > compatible packages (like "connect-mongo") are available on NPM.       *
+     * > While @sailshq/connect-redis is a popular choice for Sails apps, many  *
+     * > other compatible packages (like "connect-mongo") are available on NPM. *
      * > (For a full list, see https://sailsjs.com/plugins/sessions)            *
      *                                                                          *
      ***************************************************************************/
-    // adapter: 'connect-redis',
+    // adapter: '@sailshq/connect-redis',
     // url: 'redis://user:password@localhost:6379/dbname',
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
@@ -212,12 +239,13 @@ module.exports = {
      * Uncomment the `onlyAllowOrigins` whitelist below to configure which      *
      * "origins" are allowed to open socket connections to your Sails app.      *
      *                                                                          *
-     * > Replace "https://example.com" with the URL of your production server.  *
+     * > Replace "https://example.com" etc. with the URL(s) of your app.        *
      * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
      *                                                                          *
      ***************************************************************************/
     // onlyAllowOrigins: [
     //   'https://example.com',
+    //   'https://staging.example.com',
     // ],
 
 
@@ -227,13 +255,13 @@ module.exports = {
      * then uncomment the following lines.  This tells Socket.io about a Redis  *
      * server it can use to help it deliver broadcasted socket messages.        *
      *                                                                          *
-     * > Be sure you have a compatible version of socket.io-redis installed!    *
+     * > Be sure a compatible version of @sailshq/socket.io-redis is installed! *
      * > (See https://sailsjs.com/config/sockets for the latest version info)   *
      *                                                                          *
      * (https://sailsjs.com/docs/concepts/deployment/scaling)                   *
      *                                                                          *
      ***************************************************************************/
-    // adapter: 'socket.io-redis',
+    // adapter: '@sailshq/socket.io-redis',
     // url: 'redis://user:password@bigsquid.redistogo.com:9562/dbname',
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
@@ -316,21 +344,27 @@ module.exports = {
    * provider's dashboard-- not here.)                                       *
    *                                                                         *
    * > For more information about configuring SSL in Sails, see:             *
-   * > https://sailsjs.com/config/*#?ssl-configuration-example               *
+   * > https://sailsjs.com/config/*#?sailsconfigssl                          *
    *                                                                         *
    **************************************************************************/
   // ssl: undefined,
 
 
+
   /**************************************************************************
    *                                                                         *
-   * Overrides for any custom configuration specifically for your app.       *
-   * (for example, production API keys)                                      *
+   * Production overrides for any custom settings specific to your app.      *
+   * (for example, production credentials for 3rd party APIs like Stripe)    *
+   *                                                                         *
+   * > See config/custom.js for more info on how to configure these options. *
    *                                                                         *
    ***************************************************************************/
   custom: {
+    baseUrl: 'https://example.com',
+    internalEmailAddress: 'support@example.com',
 
-    // mailgunApiKey: 'key-prod_fake_bd32301385130a0bafe030c',
+    // mailgunDomain: 'mg.example.com',
+    // mailgunSecret: 'key-prod_fake_bd32301385130a0bafe030c',
     // stripeSecret: 'sk_prod__fake_Nfgh82401348jaDa3lkZ0d9Hm',
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking them in to version control, you might opt to
@@ -338,7 +372,8 @@ module.exports = {
     //
     // For example:
     // ```
-    // sails_custom__mailgunApiKey=key-prod_fake_bd32301385130a0bafe030c
+    // sails_custom__mailgunDomain=mg.example.com
+    // sails_custom__mailgunSecret=key-prod_fake_bd32301385130a0bafe030c
     // sails_custom__stripeSecret=sk_prod__fake_Nfgh82401348jaDa3lkZ0d9Hm
     // ```
     //--------------------------------------------------------------------------
