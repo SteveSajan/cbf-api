@@ -64,4 +64,6 @@ module.exports.routes = {
   '/terms':                   '/legal/terms',
   '/logout':                  '/api/account/logout',
 
+  'GET /api/sermons/sync': {action: 'sermon/sync'}
+
 };

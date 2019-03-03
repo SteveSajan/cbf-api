@@ -19,4 +19,5 @@ module.exports.policies = {
   'deliver-contact-form-message': true,
   'song/find': true,
   'sermon/find': true,
+  'sermon/sync': true
 };

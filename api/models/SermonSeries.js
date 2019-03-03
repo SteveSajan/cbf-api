@@ -16,6 +16,9 @@ module.exports = {
     name: {
       type: 'string',
       required: true
+    },
+    websiteId: {
+      type: 'number'
     }
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
