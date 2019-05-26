@@ -68,11 +68,19 @@ the account verification message.)`,
 
     // Build up data for the new user record and save it to the database.
     // (Also use `fetch` to retrieve the new ID so that we can use it below.)
+    var userRecord = await User.findOne({
+      emailAddress: inputs.emailAddress.toLowerCase(),
+    });
+
+    // If there was matching user, respond thru the "badCombo" exit.
+    if(userRecord) {
+      throw 'emailAlreadyInUse';
+    }
+
     var newUserRecord = await User.create(Object.assign({
       emailAddress: newEmailAddress,
       password: await sails.helpers.passwords.hashPassword(inputs.password),
-      fullName: inputs.fullName,
-      tosAcceptedByIp: this.req.ip
+      fullName: inputs.fullName
     }, sails.config.custom.verifyEmailAddresses? {
       emailProofToken: await sails.helpers.strings.random('url-friendly'),
       emailProofTokenExpiresAt: Date.now() + sails.config.custom.emailProofTokenTTL,
@@ -82,17 +90,6 @@ the account verification message.)`,
     .intercept({name: 'UsageError'}, 'invalid')
     .fetch();
 
-    // If billing feaures are enabled, save a new customer entry in the Stripe API.
-    // Then persist the Stripe customer id in the database.
-    if (sails.config.custom.enableBillingFeatures) {
-      let stripeCustomerId = await sails.helpers.stripe.saveBillingInfo.with({
-        emailAddress: newEmailAddress
-      });
-      await User.update(newUserRecord.id).set({
-        stripeCustomerId
-      });
-    }
-
     // Store the user's new id in their session.
     this.req.session.userId = newUserRecord.id;
 
@@ -100,12 +97,14 @@ the account verification message.)`,
       // Send "confirm account" email
       await sails.helpers.sendTemplateEmail.with({
         to: newEmailAddress,
+
         subject: 'Please confirm your account',
         template: 'email-verify-account',
         templateData: {
           fullName: inputs.fullName,
           token: newUserRecord.emailProofToken
         }
+
       });
     } else {
       sails.log.info('Skipping new account email verification... (since `verifyEmailAddresses` is disabled)');

@@ -49,7 +49,7 @@ module.exports.datastores = {
      *                                                                          *
      ***************************************************************************/
     adapter: 'sails-mongo',
-    url: 'mongodb://10.10.10.11/church-app',
+    url: 'mongodb://localhost:27017/church-app',
 
   },
 

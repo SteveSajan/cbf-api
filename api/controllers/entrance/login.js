@@ -64,7 +64,14 @@ and exposed as \`req.me\`.)`
       // To customize the response for _only this_ action, replace `responseType` with
       // something else.  For example, you might set `statusCode: 498` and change the
       // implementation below accordingly (see http://sailsjs.com/docs/concepts/controllers).
+    },
+
+    notActivated: {
+      description: `The provided email has not been approved yet. Please try again later
+      or contact the approvers.`,
+      responseType: 'unauthorized'
     }
+
 
   },
 
@@ -80,7 +87,10 @@ and exposed as \`req.me\`.)`
     // If there was no matching user, respond thru the "badCombo" exit.
     if(!userRecord) {
       throw 'badCombo';
-    }
+    } else if(!userRecord.active) {
+      sails.log.info("active: {}", userRecord.active);
+      throw 'notActivated';
+    } 
 
     // If the password doesn't match, then also exit thru "badCombo".
     await sails.helpers.passwords.checkPassword(inputs.password, userRecord.password)
